@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        .outer_container{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .inner_container{
+            display: none;
+            width: 800px;
+            height: 850px;
+            /* background-color: red; */
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+            border-radius: 19px;
+
+        }
+        .heading{
+            margin-top: 0px;
+            padding:10px 0px;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+            width: 100%;
+            background-color: burlywood;
+        }
+        .inner_heading{
+            width: 20%;
+            margin-left:40%;
+
+            font-size: 24px;
+            height: 23px;
+            background-color: burlywood;
+        }
+        .text_area{
+            width: 100%;
+            height: 90%;
+        }
+        .required{
+            display: flex;
+            flex-direction: row;
+        }
+        #query{
+            width: 40%;
+            height: 100%;
+        }
+        body > div > div > form > div{
+            width: 80%;
+        }
+        form{
+            display: flex;
+        }
+        #query{
+            width: 581px;
+        }
+        #submit{
+            width: 80px;
+            margin-left: 36px;
+            height: 28px;
+        }
+        .text_area{
+            overflow-y: scroll;
+            overflow-x: hidden;
+            margin-top: 10px;
+        }
+        .inner_text_area{
+            margin: 10px 10px;
+            margin-top: 30px;
+            width: 94%;
+            height: 100%;
+            /* background-color: red; */
+        }
+        .question{
+            max-width: 500px;
+            /* height: 10px; */
+            background-color: rgb(208, 205, 205);
+            margin: 12px 24px;
+            padding:35px 20px;
+            /* overflow-y: auto; */
+            border-radius:18px;
+            border-top-left-radius: 0px;
+            box-shadow: 7px 8px 29px 0px rgba(107,87,87,0.7);
+            -webkit-box-shadow: 7px 8px 29px 0px rgba(107,87,87,0.7);
+            -moz-box-shadow: 7px 8px 29px 0px rgba(107,87,87,0.7);
+            
+        }
+        .answer{
+            max-width: 500px;
+            /* height: 10px; */
+            background-color: rgb(157, 228, 171);
+            margin: 12px 24px;
+            margin-left: 258px;
+            padding:35px 20px;
+            border-radius:18px;
+            border-top-right-radius: 0px;
+            box-shadow: -8px 8px 29px 0px rgba(107,87,87,0.7);
+            -webkit-box-shadow: -8px 8px 29px 0px rgba(107,87,87,0.7);
+            -moz-box-shadow: -8px 8px 29px 0px rgba(107,87,87,0.7);
+        }
+        .heading {
+            margin-top: 0px;
+            padding: 10px 0px;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+            width: 100%;
+            border-top-left-radius: 17px;
+            border-top-right-radius: 17px;
+            background-color: burlywood;
+        }
+        #biggest_container > form > div > label{
+            display: none;
+        }
+        #biggest_container > form{
+            margin-left: 17px;
+            width: 100%;
+        }
+        #biggest_container > form > div{
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 6px;
+        }
+        #query{
+            width: 100%;
+            border-radius: 5px;
+
+        }
+        
+        #submit {
+            width: 80px;
+            margin-left: 36px;
+            height: 28px;
+            border-radius: 9px;
+        }
+        #submit:hover{
+            background-color:rgb(137, 196, 196);
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="outer_container" >
+        <div class="inner_container" id="biggest_container">
+            <div class="heading"><div class="inner_heading">TnP Chatbot</div></div>
+            <div class="text_area">
+                <div class="inner_text_area">
+                </div>
+            </div>
+            {% from "bootstrap5/form.html" import render_form, render_field %}
+            <form action="{{url_for('home')}}" method="post">
+                {{render_field(form.query)}}
+                {{render_field(form.submit)}}
+            </form>
+        </div>
+    </div>
+    <button id="toggle_button">Toggle</button>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        
+        const enterButton = document.getElementById("submit")
+        const toggleBtn = document.getElementById("toggle_button")
+        const chatbot = document.getElementById("biggest_container")
+        toggleBtn.addEventListener("click", function() {
+            if (chatbot.style.display !== "none"){
+                chatbot.style.display = "none";
+            }
+            else{
+                chatbot.style.display = "block";
+            }
+        });
+
+
+        $(document).ready(function () {
+            $("form").on("submit", function (event) {
+                event.preventDefault();
+                var query = $("input[name='query']").val();
+                $(".inner_text_area").append('<div class="question">' + query + '</div>');
+                $("input[name='query']").val('');
+                if (query) {
+                    $.ajax({
+                        url: "{{ url_for('home') }}",
+                        method: "POST",
+                        data: { query: query },
+                        success: function (response) {
+                            // Update the chat area with the response
+                            
+                            $(".inner_text_area").append('<div class="answer">' + response + '</div>');
+
+                            // Clear the input field
+                            $("input[name='query']").val('');
+                        },
+                    });
+                }
+            });
+            $("#query").on("keypress", function(event){
+                if (event.key === "Enter")
+                {
+
+                    event.preventDefault();
+                    var query = $("input[name='query']").val();
+                    $(".inner_text_area").append('<div class="question">' + query + '</div>');
+                    $("input[name='query']").val('');
+                    if (query) {
+                        $.ajax({
+                            url: "{{ url_for('home') }}",
+                            method: "POST",
+                            data: { query: query },
+                        success: function (response) {
+                            // Update the chat area with the response
+                            
+                            $(".inner_text_area").append('<div class="answer">' + response + '</div>');
+
+                            // Clear the input field
+                            $("input[name='query']").val('');
+                        },
+                    });
+                }
+                }
+            })
+        });
+    </script>
+
+</body>
+</html>

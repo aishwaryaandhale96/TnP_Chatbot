@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <style>
+        /* CSS for the chatbot container */
+        .chatbot-container {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 450px;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            background-color: #f5f5f5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* CSS for the chatbot header */
+        .chatbot-header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        /* CSS for the chatbot content */
+        .chatbot-content {
+            padding: 15px;
+        }
+
+        /* CSS for the toggle button */
+        .toggle-button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 10px 20px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        /* CSS for the cross (X) symbol */
+        .close-button {
+            background: none;
+            border: none;
+            color: #030303;
+            font-size: 18px;
+            position: absolute;
+            right: 8px;
+            top: 9px;
+            cursor: pointer;
+        }
+        .close-button:hoveer{
+            background-color: red;
+            color: white;
+        }
+        /* Additional styling for the input and enter button */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        #enter-button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 10px 8px;
+        }
+        .conversation{
+            width: 180%;
+            height: 300px;
+            overflow: scroll;
+        }
+        .chatbot-bottom-area{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        #chat-input{
+            margin: 2px;
+            margin-right: 9px;
+            overflow:scroll;
+        }
+        .bot_message{
+            width: 314px;
+            overflow: auto;
+            background-color: burlywood;
+            margin-top: 3px;
+            border-radius: 12px;
+            padding: 4px;
+            border-top-left-radius: 0px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toggle button to open/close the chatbot -->
+    <button id="toggle-button" class="toggle-button">Open Chatbot</button>
+
+    <!-- Chatbot container -->
+    <div id="chatbot" class="chatbot-container">
+        <div class="chatbot-header">
+            Chatbot
+            <button id="close-button" class="close-button">&#10006;</button>
+        </div>
+        <div class="chatbot-content">
+            <div class="conversation" id="chat-widget-messages">
+                    
+            </div>
+            <div class="chatbot-bottom-area">
+                <input type="text" id="chat-input" placeholder="Type your message...">
+                <button id="enter-button">Enter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the HTML elements
+        const toggleButton = document.getElementById("toggle-button");
+        const chatbot = document.getElementById("chatbot");
+        const closeButton = document.getElementById("close-button");
+        const enterButton = document.getElementById("enter-button");
+
+        // Toggle chatbot visibility when the toggle button is clicked
+        toggleButton.addEventListener("click", function () {
+            chatbot.style.display = "block";
+        });
+
+        // Close the chatbot when the close button is clicked
+        closeButton.addEventListener("click", function () {
+            chatbot.style.display = "none";
+        });
+
+        enterButton.addEventListener("click", function () {
+        submitUserMessage();
+        });
+
+        // Chatbot input handling
+        $("#chat-input").on("keypress", function (event) {
+            if (event.which === 13) {
+                submitUserMessage();
+            }
+        });
+
+        // Function to submit user's message
+        function submitUserMessage() {
+            let userMessage = $("#chat-input").val().trim(); // Remove leading and trailing whitespace
+
+            if (userMessage !== "") {
+                $("#chat-input").val("");
+                $("#chat-widget-messages").append("<div class='bot_message'><strong>You:</strong> " + userMessage + "</div>");
+            }
+        }
+
+        // Chatbot input handling
+        $("#chat-input").on("keypress", function(event) {
+            if (event.which === 13) {
+                let userMessage = $("#chat-input").val();
+                if(userMessage !== ""){
+
+                    $("#chat-input").val("");
+                    $("#chat-widget-messages").append("<div class='bot_message'><strong>You:</strong> " + userMessage + "</div>");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ url_for('home') }}",
+                        contentType: "application/json",
+                        data: JSON.stringify({message:userMessage}),
+                        success:function(data){
+                            let botResponse = data.response;
+                            console.log(botResponse);
+
+                            $("#chat-widget-messages").append("<div class='bot_message'><strong>Bot:</strong>" + botResponce + "</div>");
+                        },
+                        error:function(){
+                            console.log(userMessage)
+                        }
+                    });
+
+                }
+            }
+        });
+        $(document).ready(function () {
+            $("form").on("submit", function (event) {
+                event.preventDefault();
+                var query = $("input[name='query']").val();
+                $(".inner_text_area").append('<div class="question">' + query + '</div>');
+                $("input[name='query']").val('');
+                if (query) {
+                    $.ajax({
+                        url: "{{ url_for('home') }}",
+                        method: "POST",
+                        data: { query: query },
+                        success: function (response) {
+                            // Update the chat area with the response
+                            
+                            $("#chat-widget-messages").append('<div class="answer">' + response + '</div>');
+
+                            // Clear the input field
+                            $("input[name='query']").val('');
+                        },
+                    });
+                }
+            });
+        });
+        
+    </script>
+</body>
+</html>

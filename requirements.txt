@@ -1,0 +1,10 @@
+PyPDF2
+langchain
+flask
+bootstrap-flask
+flask-wtf
+wtforms
+requests
+langchain-community
+openai
+tiktoken
